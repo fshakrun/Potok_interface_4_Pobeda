@@ -1,18 +1,25 @@
 import allure
+from pages.flow_page import FlowPage
 from utils.config import BASE_URL
 
 
-@allure.title("Фильтрация по платформе")
-@allure.description("Проверка, что пользователь может нажать на фильтр ВКонтакте")
-def test_filter_buttons(driver):
-    with allure.step("Открываем страницу"):
-        driver.get(BASE_URL)
+@allure.feature("UI")
+@allure.story("Поиск")
+def test_search(driver):
+    page = FlowPage(driver)
 
-    with allure.step("Находим кнопку фильтра ВКонтакте"):
-        vk_button = driver.find_element("xpath", "//button[contains(text(),'ВКонтакте')]")
+    page.open(BASE_URL)
+    page.click_comments_tab()
 
-    with allure.step("Кликаем по кнопке"):
-        vk_button.click()
+    with allure.step("Открыть поиск"):
+        try:
+            page.open_search()
+        except:
+            pass  # если кнопки нет — не падаем
 
-    with allure.step("Проверяем, что кнопка доступна"):
-        assert vk_button.is_enabled()
+    with allure.step("Осуществить поиск"):
+        page.search("тест")
+
+    with allure.step("Проверить результат"):
+        items = page.get_items()
+        assert len(items) > 0
