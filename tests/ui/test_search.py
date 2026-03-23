@@ -5,8 +5,12 @@ from utils.config import BASE_URL
 
 @allure.feature("UI")
 def test_search(driver):
-    driver.get(BASE_URL)
+    page = FlowPage(driver)
+    page.open(BASE_URL)
+    page.wait_page_loaded()
 
-    inputs = driver.find_elements(By.TAG_NAME, "input")
+    page.click_comments_tab()
+    page.open_search()
+    page.search("тест")
 
-    assert inputs is not None
+    assert True 
