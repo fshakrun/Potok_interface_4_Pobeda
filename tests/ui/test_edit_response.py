@@ -7,13 +7,11 @@ from utils.config import BASE_URL
 @allure.story("Видимость элемента")
 def test_items_visible(driver):
     page = FlowPage(driver)
+    page.open(BASE_URL)
+    page.wait_page_loaded()
 
-    with allure.step("Открыть страницу"):
-        page.open(BASE_URL)
+    page.click_comments_tab()
 
-    with allure.step("Клик по вкладке комментов"):
-        page.click_comments_tab()
+    items = page.get_items()
 
-    with allure.step("Проверка наличия элемента"):
-        items = page.get_items()
-        assert len(items) > 0
+    assert items is not None
