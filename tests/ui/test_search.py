@@ -1,16 +1,24 @@
 import allure
-from selenium.webdriver.common.by import By
+from pages.flow_page import FlowPage
 from utils.config import BASE_URL
 
 
 @allure.feature("UI")
+@allure.story("Search")
 def test_search(driver):
-    page = FlowPage(driver)
-    page.open(BASE_URL)
-    page.wait_page_loaded()
+    with allure.step("Открыть страницу"):
+        page = FlowPage(driver)
+        page.open(BASE_URL)
+        page.wait_page_loaded()
 
-    page.click_comments_tab()
-    page.open_search()
-    page.search("тест")
+    with allure.step("Открыть вкладку комментариев"):
+        page.click_comments_tab()
 
-    assert True 
+    with allure.step("Открыть поиск"):
+        page.open_search()
+
+    with allure.step("Выполнить поиск"):
+        page.search("тест")
+
+    with allure.step("Проверка: тест не упал"):
+        assert True
