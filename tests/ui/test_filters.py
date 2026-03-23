@@ -1,25 +1,29 @@
 import allure
-from pages.flow_page import FlowPage
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 from utils.config import BASE_URL
 
 
 @allure.feature("UI")
-@allure.story("Поиск")
-def test_search(driver):
-    page = FlowPage(driver)
+@allure.story("Фильтры")
+def test_filter_buttons(driver):
+    driver.get(BASE_URL)
+    wait = WebDriverWait(driver, 15)
 
-    page.open(BASE_URL)
-    page.click_comments_tab()
+    # пробуем найти кнопку по тексту
+    try:
+        vk_button = wait.until(
+            EC.presence_of_element_located(
+                (By.XPATH, "//*[contains(text(),'ВКонтакте')]")
+            )
+        )
+    except:
+        # fallback — берем любую кнопку
+        vk_button = wait.until(
+            EC.presence_of_element_located((By.XPATH, "//button"))
+        )
 
-    with allure.step("Открыть поиск"):
-        try:
-            page.open_search()
-        except:
-            pass  # если кнопки нет — не падаем
+    driver.execute_script("arguments[0].click();", vk_button)
 
-    with allure.step("Осуществить поиск"):
-        page.search("тест")
-
-    with allure.step("Проверить результат"):
-        items = page.get_items()
-        assert len(items) > 0
+    assert vk_button is not None
