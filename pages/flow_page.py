@@ -16,10 +16,10 @@ class FlowPage:
         self.wait.until(
             lambda d: d.find_element("class name", "edit-btn")
         ).click()
-
+        
     def click_comments_tab(self):
-        el = self.wait.until(EC.element_to_be_clickable((By.ID, "comments-tab")))
-        el.click()
+        tab = wait_for_element_clickable(self.driver, (By.ID, "comments-tab"))
+        self.driver.execute_script("arguments[0].click();", tab)
 
     def open_search(self):
         self.wait.until(EC.element_to_be_clickable((By.ID, "toggleSearch"))).click()
