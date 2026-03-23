@@ -8,8 +8,11 @@ from utils.config import BASE_URL
 @allure.feature("UI")
 @allure.story("Фильтры")
 def test_filter_buttons(driver):
-    driver.get(BASE_URL)
+    page = FlowPage(driver)
+    page.open(BASE_URL)
+    page.wait_page_loaded()
 
-    tabs = driver.find_elements(By.TAG_NAME, "button")
+    buttons = page.get_buttons()
 
-    assert len(tabs) > 0
+    # проверяем что кнопки вообще есть
+    assert len(buttons) > 0
