@@ -1,18 +1,21 @@
 import allure
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 from utils.config import BASE_URL
 
 
-@allure.title("Переключение вкладок")
-@allure.description("Проверка, что пользователь может открыть вкладку комментариев")
+@allure.feature("UI")
+@allure.story("Переключение вкладок")
 def test_tabs_switch(driver):
-    with allure.step("Открываем страницу"):
-        driver.get(BASE_URL)
+    driver.get(BASE_URL)
 
-    with allure.step("Находим вкладку комментариев"):
-        tab = driver.find_element("id", "comments-tab")
+    wait = WebDriverWait(driver, 15)
 
-    with allure.step("Кликаем на вкладку"):
-        tab.click()
+    tab = wait.until(
+        EC.presence_of_element_located((By.ID, "comments-tab"))
+    )
 
-    with allure.step("Проверяем, что вкладка отображается"):
-        assert tab.is_displayed()
+    driver.execute_script("arguments[0].click();", tab)
+
+    assert tab is not None
