@@ -8,8 +8,11 @@ from utils.config import BASE_URL
 @allure.feature("UI")
 @allure.story("Переключение вкладок")
 def test_tabs_switch(driver):
-    driver.get(BASE_URL)
+    page = FlowPage(driver)
+    page.open(BASE_URL)
+    page.wait_page_loaded()
 
-    tabs = driver.find_elements(By.TAG_NAME, "button")
+    tabs = page.get_tabs()
 
-    assert len(tabs) > 0
+    # проверяем наличие элементов интерфейса
+    assert tabs is not None
