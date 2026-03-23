@@ -6,11 +6,12 @@ from selenium.webdriver.support import expected_conditions as EC
 class FlowPage:
     def __init__(self, driver):
         self.driver = driver
-        self.wait = WebDriverWait(driver, 15)
+        self.wait = WebDriverWait(driver, 10)
 
     def open(self, url):
         self.driver.get(url)
 
+    def wait_page_loaded(self):
         self.wait.until(
             EC.presence_of_element_located((By.TAG_NAME, "body"))
         )
@@ -22,21 +23,32 @@ class FlowPage:
             )
             self.driver.execute_script("arguments[0].click();", tab)
         except:
-            # fallback — если нет id
-            buttons = self.driver.find_elements(By.TAG_NAME, "button")
-            if buttons:
-                self.driver.execute_script("arguments[0].click();", buttons[0])
-
-    def get_items(self):
-        return self.driver.find_elements(By.XPATH, "//div")
+            pass  # таб может отсутствовать в статическом HTML
 
     def open_search(self):
-        buttons = self.driver.find_elements(By.TAG_NAME, "button")
-        if buttons:
-            self.driver.execute_script("arguments[0].click();", buttons[0])
+        try:
+            btn = self.wait.until(
+                EC.presence_of_element_located((By.XPATH, "//button[contains(text(),'Поиск')]"))
+            )
+            btn.click()
+        except:
+            pass
 
     def search(self, text):
-        inputs = self.driver.find_elements(By.TAG_NAME, "input")
-        if inputs:
-            inputs[0].clear()
-            inputs[0].send_keys(text)
+        try:
+            input_field = self.wait.until(
+                EC.presence_of_element_located((By.XPATH, "//input"))
+            )
+            input_field.clear()
+            input_field.send_keys(text)
+        except:
+            pass
+
+    def get_items(self):
+        return self.driver.find_elements(By.CLASS_NAME, "item")
+
+    def get_tabs(self):
+        return self.driver.find_elements(By.XPATH, "//*[contains(@id,'tab')]")
+
+    def get_buttons(self):
+        return self.driver.find_elements(By.TAG_NAME, "button")
