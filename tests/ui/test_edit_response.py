@@ -3,19 +3,17 @@ from pages.flow_page import FlowPage
 from utils.config import BASE_URL
 
 
-@allure.title("Отображение списка комментариев")
-@allure.description("Проверка, что список комментариев загружается")
+@allure.feature("UI")
+@allure.story("Видимость элемента")
 def test_items_visible(driver):
     page = FlowPage(driver)
 
-    with allure.step("Открываем страницу"):
+    with allure.step("Открыть страницу"):
         page.open(BASE_URL)
 
-    with allure.step("Переходим во вкладку комментариев"):
+    with allure.step("Клик по вкладке комментов"):
         page.click_comments_tab()
 
-    with allure.step("Получаем элементы списка"):
+    with allure.step("Проверка наличия элемента"):
         items = page.get_items()
-
-    with allure.step("Проверяем, что список не пустой"):
         assert len(items) > 0
