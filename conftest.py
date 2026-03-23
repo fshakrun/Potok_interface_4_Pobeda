@@ -1,6 +1,5 @@
 import pytest
 import allure
-import requests
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 
@@ -8,13 +7,18 @@ from selenium.webdriver.chrome.options import Options
 @pytest.fixture
 def driver():
     options = Options()
-    options.add_argument("--start-maximized")
+
+    
+    options.add_argument("--headless=new")
+    options.add_argument("--no-sandbox")
+    options.add_argument("--disable-dev-shm-usage")
+    options.add_argument("--disable-gpu")
+    options.add_argument("--window-size=1920,1080")
 
     driver = webdriver.Chrome(options=options)
     driver.implicitly_wait(5)
 
     yield driver
-
     driver.quit()
 
 
@@ -31,19 +35,3 @@ def pytest_runtest_makereport(item, call):
                 name="screenshot",
                 attachment_type=allure.attachment_type.PNG
             )
-API_HEALTHCHECK_URL = "http://localhost:5000/ego18/billing/api/pending_counts"
-
-
-def is_backend_alive():
-    try:
-        response = requests.get(API_HEALTHCHECK_URL, timeout=2)
-        return response.status_code == 200
-    except Exception:
-        return False
-
-
-def pytest_runtest_setup(item):
-    # Проверяем только тесты, которым нужен backend
-    if "api" in item.nodeid or "ui" in item.nodeid:
-        if not is_backend_alive():
-            pytest.skip("❌ Backend is not running on localhost:5000")
