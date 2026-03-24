@@ -24,20 +24,25 @@ jobs:
       - name: Install dependencies
         run: |
           pip install -r requirements.txt
-
-      # ✅ Запускаем mock API
+          
       - name: Start mock API
         run: |
-          nohup python tests/api/mock_api.py > api.log 2>&1 &
+          python tests/api/mock_api.py > api.log 2>&1 &
+          sleep 3
 
-      # ✅ Ждём пока API поднимется
-      - name: Wait for API
+      - name: Wait for API (hard check)
         run: |
-          for i in {1..10}; do
-            curl -s http://localhost:5000/ego18/billing/api/pending_counts && break
+            for i in {1..20}; do
+            if curl -f http://localhost:5000/ego18/billing/api/pending_counts; then
+            echo "API is ready"
+            exit 0
+            fi
             echo "Waiting for API..."
             sleep 2
-          done
+            done
+            echo "API failed to start"
+            cat api.log
+            exit 1
 
       # ✅ Запуск тестов
       - name: Run tests
