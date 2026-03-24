@@ -3,8 +3,6 @@ import allure
 from utils.config import API_BASE
 
 
-@allure.feature("API")
-@allure.story("Доступность API")
 @allure.title("Проверка доступности API")
 @allure.description("Проверка, что API отвечает и доступен")
 def test_api_is_alive():
@@ -15,8 +13,6 @@ def test_api_is_alive():
         assert response.status_code == 200
 
 
-@allure.feature("API")
-@allure.story("Счетчики комментариев")
 @allure.title("Проверка счетчиков комментариев")
 @allure.description("API должен возвращать корректное количество элементов")
 def test_pending_counts():
@@ -35,8 +31,6 @@ def test_pending_counts():
         assert data["all_count"] >= 0
 
 
-@allure.feature("API")
-@allure.story("Фильтры")
 @allure.title("Проверка фильтров")
 @allure.description("API должен возвращать фильтры comments и reviews")
 def test_filter_counts():
@@ -53,8 +47,6 @@ def test_filter_counts():
         assert "reviews" in data
 
 
-@allure.feature("API")
-@allure.story("Управление ботом")
 @allure.title("Остановка бота")
 @allure.description("Проверка, что API корректно останавливает бота")
 def test_stop_bot():
@@ -69,8 +61,6 @@ def test_stop_bot():
         assert data["success"] is True
 
 
-@allure.feature("API")
-@allure.story("Управление ботом")
 @allure.title("Запуск бота")
 @allure.description("Проверка, что API корректно запускает бота")
 def test_start_bot():
