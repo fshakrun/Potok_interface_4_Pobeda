@@ -1,4 +1,4 @@
-name: Tests + Allure Report
+name: Run Tests + Allure Report
 
 on:
   push:
@@ -13,54 +13,43 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # 📥 Код
-      - name: Checkout repository
+      - name: 📥 Checkout repo
         uses: actions/checkout@v4
 
-      # 🐍 Python
-      - name: Setup Python
+      - name: 🐍 Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: 3.12
 
-      # 📦 зависимости
-      - name: Install dependencies
+      - name: 📦 Install dependencies
         run: |
           pip install -r requirements.txt
 
-      # 🌐 Chrome
-      - name: Install Chrome
+      - name: 🌐 Install Chrome
         uses: browser-actions/setup-chrome@v1
 
-      # ▶️ тесты
-      - name: Run tests
+      - name: 🎭 Install ChromeDriver
+        uses: nanasess/setup-chromedriver@v2
+
+      - name: 📊 Install Allure CLI
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y openjdk-11-jre
+          wget https://github.com/allure-framework/allure2/releases/latest/download/allure-2.27.0.tgz
+          tar -zxvf allure-2.27.0.tgz
+          sudo mv allure-2.27.0 /opt/allure
+          sudo ln -s /opt/allure/bin/allure /usr/bin/allure
+
+      - name: ▶️ Run tests
         run: |
           pytest --alluredir=allure-results
 
-      # ☕ Java (нужен для Allure)
-      - name: Setup Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: 17
-
-      # 📊 Установка Allure CLI
-      - name: Install Allure
-        run: |
-          wget https://github.com/allure-framework/allure2/releases/latest/download/allure-2.27.0.tgz
-          tar -zxvf allure-2.27.0.tgz
-          echo "$(pwd)/allure-2.27.0/bin" >> $GITHUB_PATH
-
-      # 📊 Генерация отчета
-      - name: Generate Allure Report
-        if: always()
+      - name: 📈 Generate Allure Report
         run: |
           allure generate allure-results --clean -o allure-report
 
-      # 🚀 Публикация
-      - name: Deploy to GitHub Pages
-        if: always()
+      - name: 🚀 Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: allure-report
+          publish_dir: ./allure-report
