@@ -1,59 +1,70 @@
-name: Run Tests + Allure Report
+name: Tests + Allure Report
 
 on:
   push:
     branches: [ main ]
   pull_request:
 
-permissions:
-  contents: write
-
 jobs:
   test:
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: write   # нужно для gh-pages
+
     steps:
-      - name: 📥 Checkout repo
+      - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: 🐍 Setup Python
+      - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: 3.12
 
-      - name: 📦 Install dependencies
+      - name: Install dependencies
         run: |
           pip install -r requirements.txt
 
-      - name: 🌐 Install Chrome
-        uses: browser-actions/setup-chrome@v1
-
-      - name: 🎭 Install ChromeDriver
-        uses: nanasess/setup-chromedriver@v2
-
-      - name: 📊 Install Allure CLI
+      # ✅ Запускаем mock API
+      - name: Start mock API
         run: |
-          sudo apt-get update
-          sudo apt-get install -y openjdk-11-jre
+          nohup python tests/api/mock_api.py > api.log 2>&1 &
 
-          ALLURE_VERSION=2.24.0
-          wget https://github.com/allure-framework/allure2/releases/download/${ALLURE_VERSION}/allure-${ALLURE_VERSION}.tgz
+      # ✅ Ждём пока API поднимется
+      - name: Wait for API
+        run: |
+          for i in {1..10}; do
+            curl -s http://localhost:5000/ego18/billing/api/pending_counts && break
+            echo "Waiting for API..."
+            sleep 2
+          done
 
-          tar -zxvf allure-${ALLURE_VERSION}.tgz
-          sudo mv allure-${ALLURE_VERSION} /opt/allure
-          sudo ln -s /opt/allure/bin/allure /usr/bin/allure
-
-          allure --version
-
-      - name: ▶️ Run tests
+      # ✅ Запуск тестов
+      - name: Run tests
         run: |
           pytest --alluredir=allure-results
 
-      - name: 📈 Generate Allure Report
+      # ✅ Установка Java (нужен для Allure)
+      - name: Install Java
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y default-jre
+
+      # ✅ Скачивание Allure (фикс версии)
+      - name: Install Allure
+        run: |
+          wget https://github.com/allure-framework/allure2/releases/download/2.24.0/allure-2.24.0.tgz
+          tar -zxvf allure-2.24.0.tgz
+          sudo mv allure-2.24.0 /opt/allure
+          sudo ln -s /opt/allure/bin/allure /usr/bin/allure
+
+      # ✅ Генерация отчёта
+      - name: Generate Allure report
         run: |
           allure generate allure-results --clean -o allure-report
 
-      - name: 🚀 Deploy to GitHub Pages
+      # ✅ Деплой в GitHub Pages
+      - name: Deploy report to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
