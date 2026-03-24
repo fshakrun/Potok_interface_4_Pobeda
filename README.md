@@ -61,7 +61,7 @@
 - pytest
 - Selenium (UI)
 - requests (API)
-- Allure (отчёты)
+- Allure (отчёты) — доступны здесь https://fshakrun.github.io/Potok_interface_4_Pobeda/
 - Flask (mock backend)
 
 ---
@@ -106,7 +106,7 @@ allure serve allure-results
 
 - GitHub Actions
 - автозапуск тестов при push
-- сохранение Allure результатов
+- сохранение Allure результатов  — они доступны здесь https://fshakrun.github.io/Potok_interface_4_Pobeda/
 
 ---
 
